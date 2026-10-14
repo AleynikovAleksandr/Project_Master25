@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Список заказов{% endblock %}
+{% block content %}
+<div class="back-row">
+    <a class="modal-cancel" href="{{ url_for('catalog.catalog') }}">← Назад</a>
+    <a class="accent-btn" href="{{ url_for('orders.new_order') }}">+ Новый заказ</a>
+</div>
+
+{% if not orders %}
+    <div class="empty-state">
+        <span class="empty-title">Заказов пока нет</span>
+    </div>
+{% else %}
+    <div class="orders-scroll">
+        <div class="orders-table" style="--order-columns: 0.5fr 1fr 2.4fr 1fr 1fr 0.6fr">
+            <div class="order-row head">
+                <div>№</div><div>Дата заказа</div><div>ФИО клиента</div><div>Сумма</div><div></div><div></div>
+            </div>
+            {% for order in orders %}
+                <div class="order-row body">
+                    <div class="num">{{ order.id }}</div>
+                    <div class="num">{{ order.order_date.strftime('%d.%m.%Y') }}</div>
+                    <div>{{ order.client }}</div>
+                    <div class="num">{{ order.total | money }}</div>
+                    <div><a class="modal-cancel small" href="{{ url_for('orders.order', order_id=order.id) }}">Состав</a></div>
+                    <form method="post" action="{{ url_for('orders.delete_order', order_id=order.id) }}"
+                          data-confirm="Удалить заказ № {{ order.id }}? Это действие нельзя отменить.">
+                        <button class="delete-btn" type="submit">Удалить</button>
+                    </form>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

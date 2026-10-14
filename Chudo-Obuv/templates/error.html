@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Ошибка{% endblock %}
+{% block page %}
+<div class="modal-overlay">
+    <div class="modal error" role="dialog" aria-modal="true">
+        <h2 class="modal-title">✖ Ошибка</h2>
+        <p class="modal-text">Не удалось выполнить действие. Проверьте подключение к базе данных и попробуйте ещё раз.</p>
+        <p class="modal-text"><small>{{ error }}</small></p>
+        <div class="modal-actions">
+            <a class="accent-btn" href="{{ url_for('login') }}">На страницу входа</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

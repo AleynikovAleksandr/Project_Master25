@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Товар{% endblock %}
+{% block content %}
+<div class="back-row">
+    <a class="modal-cancel" href="{{ url_for('catalog.catalog') }}">← Назад</a>
+</div>
+
+<div class="product-card">
+    <img class="product-photo big" src="{{ url_for('static', filename=product.image_url) }}" alt="{{ product.name }}">
+    <div class="product-info">
+        <div class="product-head">
+            <h2 class="product-name">{{ product.name }}</h2>
+            <span class="product-category">{{ product.category }}</span>
+        </div>
+        <span class="product-meta"><b>Производство:</b> {{ product.manufacturer }}</span>
+        <span class="product-meta"><b>Цена со скидкой:</b> {{ product.final_price | money }}
+            {% if product.has_discount %}<s>{{ product.price | money }}</s>{% endif %}</span>
+        <p class="product-desc"><b>Состав:</b> {{ product.composition }}</p>
+        <p class="product-desc"><b>Описание:</b> {{ product.description }}</p>
+        <span class="product-meta"><b>Размерный ряд:</b> {{ stock | map(attribute='size') | join(', ') }}</span>
+
+        {% if available %}
+            <form class="product-form" method="post" action="{{ url_for('cart.add') }}">
+                <input type="hidden" name="product_id" value="{{ product.id }}">
+                <div class="modal-field">
+                    <label class="modal-label" for="size">Размер</label>
+                    <select class="modal-input" id="size" name="stock_id">
+                        {% for row in available %}
+                            <option value="{{ row.id }}">{{ row.size }} (в наличии {{ row.quantity }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="modal-field">
+                    <label class="modal-label" for="qty">Количество пар</label>
+                    <input class="modal-input qty" id="qty" name="qty" type="number" min="1" value="1" required>
+                </div>
+                <button class="accent-btn" type="submit">Добавить в заказ</button>
+            </form>
+        {% else %}
+            <span class="product-meta">Нет размеров, доступных для заказа.</span>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

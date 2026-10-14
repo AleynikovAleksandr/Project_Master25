@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Вход в систему{% endblock %}
+{% block page %}
+<div id="login-root">
+    <form id="login-card" method="post">
+        <img class="login-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="Чудо Обувь">
+        <div class="login-head">
+            <div class="login-title">Вход</div>
+            <div class="login-subtitle">Введите логин, чтобы оформить заказ</div>
+        </div>
+
+        <div class="field">
+            <input class="glass-input" id="login" name="login" value="{{ login or '' }}" placeholder="Логин" aria-label="Логин" autofocus>
+        </div>
+
+        <button class="submit-btn" type="submit">Войти</button>
+        <a class="guest-link" href="{{ url_for('enter_as_guest') }}">Просмотр каталога без авторизации</a>
+    </form>
+</div>
+{% endblock %}

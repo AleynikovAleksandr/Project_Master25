@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Заказ № {{ order.id }}{% endblock %}
+{% block content %}
+<div class="back-row">
+    <a class="modal-cancel" href="{{ url_for('orders.orders') }}">← Назад</a>
+</div>
+
+<div class="order-info">
+    {% if can('edit_orders') %}
+        <form class="product-form" method="post" action="{{ url_for('orders.update_order', order_id=order.id) }}">
+            <div class="modal-field">
+                <label class="modal-label" for="user_id">Клиент</label>
+                <select class="modal-input" id="user_id" name="user_id">
+                    {% for user in users %}
+                        <option value="{{ user.id }}" {% if user.id == order.user_id %}selected{% endif %}>
+                            {{ user.last_name }} {{ user.first_name }} {{ user.middle_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="modal-field">
+                <label class="modal-label" for="order_date">Дата заказа</label>
+                <input class="modal-input" id="order_date" name="order_date" type="date"
+                       value="{{ order.order_date.isoformat() }}" max="{{ today }}" required>
+            </div>
+            <button class="accent-btn small" type="submit">Сохранить</button>
+        </form>
+    {% else %}
+        <span class="product-meta"><b>Клиент:</b> {{ order.client }}</span>
+        <span class="product-meta"><b>Дата заказа:</b> {{ order.order_date.strftime('%d.%m.%Y') }}</span>
+    {% endif %}
+</div>
+
+{% set columns = '2.4fr 0.7fr 1.6fr 1.1fr 1fr 0.8fr' if can('edit_orders') else '2.4fr 0.7fr 0.9fr 1.1fr 1fr' %}
+<div class="orders-scroll">
+    <div class="orders-table" style="--order-columns: {{ columns }}">
+        <div class="order-row head">
+            <div>Товарная позиция</div>
+            <div>Размер</div>
+            <div>Количество</div>
+            <div>Цена за единицу</div>
+            <div>Сумма</div>
+            {% if can('edit_orders') %}
+                <div></div>
+            {% endif %}
+        </div>
+        {% for line in lines %}
+            <div class="order-row body">
+                <div>{{ line.name }} ({{ line.manufacturer }})</div>
+                <div class="num">{{ line.size }}</div>
+                {% if can('edit_orders') %}
+                    <form method="post" action="{{ url_for('orders.change_quantity', order_id=order.id, item_id=line.id) }}">
+                        <input class="modal-input qty" name="qty" type="number" min="1" value="{{ line.quantity }}" required>
+                        <button class="modal-cancel small" type="submit">Изменить</button>
+                    </form>
+                {% else %}
+                    <div class="num">{{ line.quantity }}</div>
+                {% endif %}
+                <div class="num">{{ line.unit_price | money }}</div>
+                <div class="num">{{ line.sum | money }}</div>
+                {% if can('edit_orders') %}
+                    <form method="post" action="{{ url_for('orders.delete_item', order_id=order.id, item_id=line.id) }}"
+                          data-confirm="Удалить позицию из заказа? Это действие нельзя отменить.">
+                        <button class="delete-btn" type="submit">Удалить</button>
+                    </form>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+<p class="order-total">Итоговая сумма: {{ order.total | money }}</p>
+
+{% if can('edit_orders') %}
+    <div class="order-info">
+        <form class="product-form" method="post" action="{{ url_for('orders.add_item', order_id=order.id) }}">
+            <div class="modal-field">
+                <label class="modal-label" for="stock_id">Добавить товар</label>
+                <select class="modal-input" id="stock_id" name="stock_id">
+                    {% for row in stock %}
+                        <option value="{{ row.id }}">{{ row.name }} ({{ row.manufacturer }}), размер {{ row.size }}, в наличии {{ row.quantity }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="modal-field">
+                <label class="modal-label" for="add_qty">Количество пар</label>
+                <input class="modal-input qty" id="add_qty" name="qty" type="number" min="1" value="1" required>
+            </div>
+            <button class="accent-btn small" type="submit">Добавить позицию</button>
+        </form>
+    </div>
+{% endif %}
+{% endblock %}

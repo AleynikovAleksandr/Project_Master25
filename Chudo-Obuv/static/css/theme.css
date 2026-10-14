@@ -1,0 +1,21 @@
+:root {
+  --font: Calibri, Carlito, sans-serif;
+  --main-bg: #FFFFFF;
+  --extra-bg: #D2F6E7;
+  --accent: #70B2AF;
+  --few-stock: #ff8080;
+  --text: #1c1c1e;
+  --text-muted: #5a5a5e;
+  --text-on-accent: #FFFFFF;
+  --error: #d0453c;
+  --warning: #e0a000;
+  --shadow-color: rgba(174, 174, 192, 0.35);
+  --light-color: rgba(255, 255, 255, 0.9);
+  --accent-shadow: rgba(112, 178, 175, 0.4);
+  --glass: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.55);
+  --overlay: rgba(40, 40, 52, 0.35);
+  --shadow-raised: 8px 8px 20px var(--shadow-color), -8px -8px 20px var(--light-color);
+  --shadow-small: 4px 4px 10px var(--shadow-color), -4px -4px 10px var(--light-color);
+  --shadow-inset: inset 3px 3px 8px var(--shadow-color), inset -3px -3px 8px var(--light-color);
+}

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Чудо Обувь — {% block title %}{% endblock %}</title>
+<link rel="icon" href="{{ url_for('static', filename='img/icon.ico') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+{% block page %}
+<div class="page">
+    <header id="topbar">
+        <div class="brand">
+            <div class="brand-logo"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="Чудо Обувь"></div>
+            <span class="brand-name">Чудо Обувь</span>
+        </div>
+
+        {% set section = request.endpoint.split('.')[0] %}
+        <nav id="segmented">
+            <a class="tab" href="{{ url_for('catalog.catalog') }}" aria-selected="{{ 'true' if section == 'catalog' else 'false' }}">Каталог</a>
+            {% if can('order') %}
+                <a class="tab" href="{{ url_for('cart.cart') }}" aria-selected="{{ 'true' if section == 'cart' else 'false' }}">Заказ ({{ session.cart | length }})</a>
+            {% endif %}
+            {% if can('orders') %}
+                <a class="tab" href="{{ url_for('orders.orders') }}" aria-selected="{{ 'true' if section == 'orders' else 'false' }}">Заказы</a>
+            {% endif %}
+        </nav>
+
+        <div id="userbox">
+            <div class="user-chip">
+                <div class="user-avatar">{{ (session.fio or session.role_name)[0] }}</div>
+                <div class="user-text">
+                    {% if session.fio %}
+                        <span class="user-name">{{ session.fio }}</span>
+                    {% endif %}
+                    <span class="user-role">{{ session.role_name }}</span>
+                </div>
+            </div>
+            <a class="logout-btn" href="{{ url_for('logout') }}" title="Выйти" aria-label="Выйти">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 4 H7 a2 2 0 0 0 -2 2 v12 a2 2 0 0 0 2 2 h7"></path>
+                    <path d="M11 12 h9"></path><path d="M17 8.5 L20.5 12 L17 15.5"></path>
+                </svg>
+            </a>
+        </div>
+    </header>
+
+    <h1 class="view-title">{{ self.title() }}</h1>
+    {% block content %}{% endblock %}
+</div>
+{% endblock %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="modal-overlay" id="messages">
+            {% set type = messages[-1][0] %}
+            <div class="modal {{ type }}" role="dialog" aria-modal="true">
+                <h2 class="modal-title">
+                    {% if type == 'error' %}✖ Ошибка{% elif type == 'warning' %}⚠ Предупреждение{% else %}ℹ Информация{% endif %}
+                </h2>
+                {% for _, text in messages %}
+                    <p class="modal-text">{{ text }}</p>
+                {% endfor %}
+                <div class="modal-actions">
+                    <button class="accent-btn" onclick="document.getElementById('messages').remove()">ОК</button>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endwith %}
+<script src="{{ url_for('static', filename='confirm.js') }}"></script>
+</body>
+</html>

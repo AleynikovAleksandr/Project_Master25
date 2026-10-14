@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+.idea/
+.vscode/
+
+# Данные подключения к БД (с паролем)
+config.py
+
+# Временные файлы Excel
+~$*

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Оформление заказа{% endblock %}
+{% block content %}
+<div class="back-row">
+    <a class="modal-cancel" href="{{ url_for('catalog.catalog') }}">← Назад</a>
+</div>
+
+{% if not lines %}
+    <div class="empty-state">
+        <span class="empty-title">В заказе пока нет товаров</span>
+        <span class="empty-hint">Выберите товар в каталоге</span>
+    </div>
+{% else %}
+    <div class="orders-scroll">
+        <div class="orders-table" style="--order-columns: 2.4fr 0.7fr 1fr 1.6fr 1fr 0.6fr">
+            <div class="order-row head">
+                <div>Товар</div><div>Размер</div><div>Цена</div><div>Количество</div><div>Сумма</div><div></div>
+            </div>
+            {% for line in lines %}
+                <div class="order-row body">
+                    <div>{{ line.product.manufacturer }} | {{ line.product.name }}</div>
+                    <div class="num">{{ line.size }}</div>
+                    <div class="num">{{ line.product.final_price | money }}</div>
+                    <form method="post" action="{{ url_for('cart.change') }}">
+                        <input type="hidden" name="stock_id" value="{{ line.stock_id }}">
+                        <input class="modal-input qty" name="qty" type="number" min="1" max="{{ line.available }}" value="{{ line.qty }}" required>
+                        <button class="modal-cancel small" type="submit">Изменить</button>
+                    </form>
+                    <div class="num">{{ line.sum | money }}</div>
+                    <form method="post" action="{{ url_for('cart.remove') }}">
+                        <input type="hidden" name="stock_id" value="{{ line.stock_id }}">
+                        <button class="delete-btn" type="submit">Удалить</button>
+                    </form>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <p class="order-total">Итого: {{ total | money }}</p>
+
+    <div class="order-info">
+        <form class="product-form" method="post" action="{{ url_for('cart.confirm') }}"
+              data-confirm="Подтвердить заказ? После подтверждения товары будут списаны со склада.">
+            {% if users %}
+                <div class="modal-field">
+                    <label class="modal-label" for="user">Клиент</label>
+                    <select class="modal-input" id="user" name="user_id">
+                        {% for user in users %}
+                            <option value="{{ user.id }}" {% if user.id == session.user_id %}selected{% endif %}>
+                                {{ user.last_name }} {{ user.first_name }} {{ user.middle_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% endif %}
+            <button class="accent-btn" type="submit">Подтвердить заказ</button>
+        </form>
+        <form method="post" action="{{ url_for('cart.cancel') }}"
+              data-confirm="Отменить заказ? Все выбранные товары будут убраны.">
+            <button class="modal-cancel" type="submit">Отменить заказ</button>
+        </form>
+    </div>
+{% endif %}
+{% endblock %}
